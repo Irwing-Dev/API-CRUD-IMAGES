@@ -1,4 +1,4 @@
-import { uploadImageService } from "../services/image.service.js";
+import { uploadImageService, findImagesService } from "../services/image.service.js";
 import fs from "fs";
 
 export const uploadImage = async (req, res) => {
@@ -20,6 +20,20 @@ export const uploadImage = async (req, res) => {
         await picture.save();
 
         res.send(picture);
+    } catch (e) {
+        return res.status(500).send({message: e.message})
+    }
+}
+
+export const findImages = async (req, res) => {
+    try {
+        const picture = await findImagesService();
+    
+        if (picture.length === 0) {
+            return res.status(400).send({message: "Nenhuma imagem encontrada."})
+        }
+
+        res.send(picture)
     } catch (e) {
         return res.status(500).send({message: e.message})
     }
