@@ -1,4 +1,4 @@
-import { uploadImageService, findImagesService, findImagesByIdService, updateImageService } from "../services/image.service.js";
+import { uploadImageService, findImagesService, findImagesByIdService, updateImageService, deleteImageService } from "../services/image.service.js";
 import fs from "fs";
 
 export const uploadImage = async (req, res) => {
@@ -13,7 +13,7 @@ export const uploadImage = async (req, res) => {
 
         //Esse teste serve para ver se ocorreu algum erro durante o upload da imagem
         if (!picture) {
-            res.status(400).send({message: "Não conseguimos fazer o upload da imagem, verifique se o tipo do arquivo é png, jpg, jpeg, svg ou webp."})
+            return res.status(400).send({message: "Não conseguimos fazer o upload da imagem, verifique se o tipo do arquivo é png, jpg, jpeg, svg ou webp."})
         }
         
         //Essa função serve para  salvar a imagem na pasta uploads
@@ -64,13 +64,29 @@ export const updateImages = async (req, res) => {
         const picture = await updateImageService(id, name, file);
 
         if (!picture) {
-            res.status(400).send({message: "Não conseguimos atualizar a imagem, verifique se o tipo do arquivo é png, jpg, jpeg, svg ou webp."})
+            return res.status(400).send({message: "Não conseguimos atualizar a imagem, verifique se o tipo do arquivo é png, jpg, jpeg, svg ou webp."})
         }
         fs.unlinkSync(picture.src)
         
         await picture.save();
         
         res.send(picture);
+    } catch (e) {
+        return res.status(500).send({message: e.message})
+    }
+}
+
+export const deleteImages = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const picture = await findImagesByIdService(id);
+
+        await deleteImageService(id);
+
+        fs.unlinkSync(picture.src);
+        
+        res.send({message: "Imagem deletada com sucesso"});
     } catch (e) {
         return res.status(500).send({message: e.message})
     }

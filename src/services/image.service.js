@@ -7,3 +7,5 @@ export const findImagesService = () => Image.find();
 export const findImagesByIdService = (id) => Image.findById(id);
 
 export const updateImageService = (id, name, file) => Image.findOneAndUpdate({_id: id}, { name, src: file.path })
+
+export const deleteImageService = (id) => Image.findOneAndDelete({_id: id});

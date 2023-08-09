@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadImage, findImages, findImagesById, updateImages } from "../controllers/image.controller.js";
+import { uploadImage, findImages, findImagesById, updateImages, deleteImages } from "../controllers/image.controller.js";
 import upload from "../middlewares/image.middleware.js";
 
 const route = express.Router();
@@ -13,6 +13,6 @@ route.get("/:id", findImagesById);
 //Essa Rota irá atualizar uma parte da imagem no banco de dados e no dispositivo colocado
 route.patch("/:id", upload.single("file"), updateImages);
 //Essa Rota irá deletar a imagem no banco de dados e no dispositivo colocado
-route.delete("/:id");
+route.delete("/:id", deleteImages);
 
 export default route
