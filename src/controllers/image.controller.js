@@ -1,4 +1,4 @@
-import { uploadImageService, findImagesService, findImagesByIdService } from "../services/image.service.js";
+import { uploadImageService, findImagesService, findImagesByIdService, updateImageService } from "../services/image.service.js";
 import fs from "fs";
 
 export const uploadImage = async (req, res) => {
@@ -50,6 +50,27 @@ export const findImagesById = async (req, res) => {
         }
 
         res.send(picture)
+    } catch (e) {
+        return res.status(500).send({message: e.message})
+    }
+}
+
+export const updateImages = async (req, res) => {
+    try {
+        const { name } = req.body
+        const file = req.file
+        const id = req.params.id
+    
+        const picture = await updateImageService(id, name, file);
+
+        if (!picture) {
+            res.status(400).send({message: "Não conseguimos atualizar a imagem, verifique se o tipo do arquivo é png, jpg, jpeg, svg ou webp."})
+        }
+        fs.unlinkSync(picture.src)
+        
+        await picture.save();
+        
+        res.send(picture);
     } catch (e) {
         return res.status(500).send({message: e.message})
     }

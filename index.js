@@ -15,7 +15,7 @@ const app = express();
 //Configuração do json
 app.use(express.json());
 
-//Configuração da conexção como banco de dados
+//Configuração da conexão com o banco de dados
 connectDB();
 
 //Definição das rotas
