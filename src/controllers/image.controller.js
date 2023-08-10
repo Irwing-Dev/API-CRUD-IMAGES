@@ -1,4 +1,4 @@
-import { uploadImageService, findImagesService, findImagesByIdService, updateImageService, deleteImageService } from "../services/image.service.js";
+import { uploadImageService, findImagesService, countImages, findImagesByIdService, updateImageService, deleteImageService } from "../services/image.service.js";
 import fs from "fs";
 
 export const uploadImage = async (req, res) => {
@@ -27,13 +27,45 @@ export const uploadImage = async (req, res) => {
 
 export const findImages = async (req, res) => {
     try {
-        const picture = await findImagesService();
+        let { limit, offset } = req.query;
+
+        limit = Number(limit);
+        offset = Number(offset);
+
+        if (!limit) {
+            limit = 5;
+        }
+
+        if (!offset) {
+            offset = 0;
+        }
+        const picture = await findImagesService(offset, limit);
+        const total = await countImages();
+        const currentUrl = req.baseUrl;
+
+        const next = offset + limit;
+        const nextUrl = next < total ? `${currentUrl}?limit=${limit}&offset=${next}` : null;
+
+        const previous = offset - limit < 0 ? null : offset - limit;
+        const previousUrl = previous != null ? `${currentUrl}?limit=${limit}&offset=${previous}` : null;
     
         if (picture.length === 0) {
             return res.status(400).send({message: "Nenhuma imagem encontrada."})
         }
 
-        res.send(picture)
+        res.send({
+            nextUrl,
+            previousUrl,
+            limit,
+            offset,
+            total,
+
+            results: picture.map((item) => ({
+                id: item._id,
+                name: item.name,
+                src: item.src
+            }))
+        })
     } catch (e) {
         return res.status(500).send({message: e.message})
     }
